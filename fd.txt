@@ -1,0 +1,88 @@
+var empEmail;
+var empName;
+$(document).ready( function() {
+
+	// alert('hi');
+	populateData();
+
+});
+
+function getJson(url) 
+{
+    return $.ajax({       
+       url: url,   
+       type: "GET",  
+       contentType: "application/json;odata=verbose",
+       headers: { 
+          "Accept": "application/json;odata=verbose"
+       }
+    });
+}
+
+function populateData()
+{
+	//GJALLY - Code starts from here
+	//FUNC to get current user Name
+	var useEmail = _spPageContextInfo.userLoginName;
+	var upURL = "https://coltinternal.sharepoint.com/sites/AMS/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v='i:0%23.f|membership|"+useEmail+"'";
+	
+	getJson(upURL).done(function(data)
+                            {
+                                // console.log(data.d.Email);
+                                // console.log(data.d.DisplayName); 
+                                if(data.d.Email && data.d.DisplayName)
+                                {
+                                	// console.log(data.d.Email);
+                                	// console.log(data.d.DisplayName);
+                                	empName = data.d.DisplayName;
+                                	empEmail = data.d.Email;
+                                	var url = "https://coltinternal.sharepoint.com/sites/AMS/_api/web/lists/getbytitle('EmployeeMaster')/items?$filter=EmpEmail eq '"+empEmail+"'";
+                                	getJson(url).done(function(data)
+                                                        {
+                                                            // var fields = data.d.Fields.results; //get fields
+                                                            var itmsCnt = data.d.results.length;
+                                                            // console.log(itmsCnt);
+                                                            // console.log(data.d.results[0].Title);
+                                                            if(itmsCnt>0)
+                                                            {
+                                                            	empID = data.d.results[0].EmpCode;
+                                                            	// console.log(empID);
+                                                            	// console.log(empName);
+                                                            	// console.log(empEmail);
+                                                            	$("input[title='Employee ID Required Field']").val(empID);
+                                                            	$("input[title='Employee ID Required Field']").before(empID);
+                                                            	$("input[title='Employee ID Required Field']").css("width","auto");
+                                                            	$("input[title='Employee ID Required Field']").css("display","none");
+
+                                                            	$("input[title='Employee Name']").val(empName);
+                                                            	$("input[title='Employee Name']").before(empName);
+                                                            	$("input[title='Employee Name']").css("width","auto");
+                                                            	$("input[title='Employee Name']").css("display","none");
+
+                                                            	$("input[title='Email Address']").val(empEmail);
+                                                            	$("input[title='Email Address']").before(empEmail);
+                                                            	$("input[title='Email Address']").css("width","auto");
+                                                            	$("input[title='Email Address']").css("display","none");
+                                                            }
+                                                            else
+                                                            {
+                                                            	alert("No EMP ID Found...!");
+                                                            }
+                                                		})
+                                                .fail(function(error)
+                                                        {
+                                                            console.log(JSON.stringify(error));
+                                                        });
+
+                                }
+                                else
+                                {
+                                	alert("Employee not found, Contact HR Team..!");
+                                }
+                                                            
+                            })
+                  .fail(function(error)
+                  			{
+                                console.log(JSON.stringify(error));
+            				});
+}

@@ -1,0 +1,183 @@
+Report requests by VO team.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT
+    a.did_number,
+    b.sub_product_type,
+    c.status,
+    d.group_name
+FROM
+    nm_number_inventory     a,
+    nm_sub_product_master   b,
+    nm_status_master c,
+    nm_group_circuit d
+WHERE
+    a.sub_product_id = b.sub_product_id (+) AND 
+    a.status_id=c.status_id (+) AND 
+    a.nm_group_circuit_id=d.nm_group_circuit_id
+                
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+select  g.Group_name ,n.circuit_id
+from nm_circuit n,
+nm_group_circuit g
+where n.nm_group_circuit_id = g.nm_group_circuit_id
+                
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT
+    b.did_number
+FROM
+nm_call_forward a,
+nm_number_inventory b
+WHERE 
+a.nm_call_forward_id=b.number_inventory_id
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT
+    d.status,COUNT(*)
+FROM
+nm_number_inventory a,
+nm_area_code_master b,
+nm_carrier_code_master c,
+nm_status_master d
+WHERE 
+a.area_id= b.area_id (+)
+AND a.carrier_name_id=c.carrier_id (+)
+and a.status_id=d.status_id
+GROUP BY a.status_id,d.status
+
+Delivery Team
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT
+    TO_CHAR(a.created_date,'yyyy/MM/dd'),count(*)
+FROM
+    nm_number_inventory  a,
+    nm_user b
+    WHERE
+    a.created_by=b.user_id (+) AND
+    a.customer_ocn IS NOT NULL AND 
+    a.reservation_id IS NOT NULL
+    AND b.group_id IN(4,5)
+    GROUP BY TO_CHAR(a.created_date,'yyyy/MM/dd')
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT a.reserved_by,COUNT(*) FROM nm_reservation_details a GROUP BY a.reserved_by
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+select nm.did_number,
+ns.status, 
+--us.FIRST_NAME,
+--us.LAST_NAME
+concat(concat(us.FIRST_NAME, ' '), us.LAST_NAME) Reservedby
+from NM_NUMBER_INVENtory  nm,
+nm_status_master ns,
+nm_reservation_details nrd,
+nm_user us
+where nm.status_id in (40,60)
+and nm.status_id= ns.status_id
+and nm.reservation_id= nrd.reservation_id
+and us.USER_ID= nrd.reserved_by
+
+
+Sales / CRS Teams
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT
+    nmc.circuit_id,
+    ngc.group_name,
+    nmi.did_number,
+    concat(concat(nmi.customer_ocn, ' - '), nmi.customer_org_name) did_cust_detail
+FROM
+    nm_circuit            nmc,
+    nm_group_circuit      ngc,
+    nm_number_inventory   nmi
+WHERE
+    nmc.nm_group_circuit_id = ngc.nm_group_circuit_id (+)
+    AND ngc.nm_group_circuit_id = nmi.nm_group_circuit_id;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+select  
+nm.did_number,TN.Termination_number
+from  nm_call_forward TN,
+nm_number_inventory nm
+where 
+TN.nm_call_forward_id = nm.number_inventory_id;
+
+
+
+
+Product Management
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT
+    nni1.did_number          toll_free_number,
+    concat(concat(nni1.customer_ocn, ' - '), nni1.customer_org_name) toll_cust_detail,
+    nni2.did_number          did_number,
+    concat(concat(nni2.customer_ocn, ' - '), nni2.customer_org_name) did_cust_detail,
+    nnf.termination_number
+FROM
+    nm_number_inventory_tollfree   ntf,
+    nm_call_forward                nnf,
+    nm_number_inventory            nni1,
+    nm_number_inventory            nni2
+WHERE
+    ntf.did_number_inventory_id = nnf.nm_call_forward_id (+)
+    AND ntf.tollfree_number_inventory_id = nni1.number_inventory_id
+    AND ntf.did_number_inventory_id = nni2.number_inventory_id
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT
+    nni.did_number,
+    ncm.country_code_iso,
+    ncm.country_name,
+    nacm.area_code,
+    nacm.area_name,
+    nccm.carrier_code,
+    nsm.status,
+    nni.customer_ocn,
+    nni.customer_org_name,
+    nni.portedin_carrier_name,
+    nni.date_of_activation,
+    nni.activated_date,
+    nni.cease_date,
+    nni.created_by,
+    nni.created_date,
+    nni.modified_by,
+    nni.modified_date,
+    nsi.sub_category_name,
+    nsp.sub_product_type,
+    nni.portedin_carrier_name,
+    nct.Customer_type_name
+FROM
+    nm_number_inventory       nni,
+    nm_status_master          nsm,
+    nm_country_master         ncm,
+    nm_area_code_master       nacm,
+    nm_carrier_code_master    nccm,
+    nm_sub_category_master    nsi,
+    nm_sub_product_master     nsp,
+    nm_customer_type_master   nct
+WHERE
+    nni.customer_type_id = nct.customer_type_id
+    AND nni.status_id = nsm.status_id
+    AND nni.country_id = ncm.country_id
+    AND nni.carrier_id = nccm.carrier_id
+    AND nni.area_id = nacm.area_id
+    AND nni.sub_category_id = nsi.sub_category_id
+    AND nni.sub_product_id = nsp.sub_product_id (+)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT  ROW_NUMBER() OVER (ORDER BY COUNT(*) DESC) AS Rank,COUNT(*),created_by FROM nm_number_inventory GROUP BY created_by  ORDER BY COUNT(*) DESC
+
+

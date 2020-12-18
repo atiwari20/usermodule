@@ -1,0 +1,73 @@
+                                        VO team 
+
+④	A list of number usage status by Area code and carrier code  (quantity of Free, reserved, activated, inactive)--
+(ex  ,  area and carrier code: 034510: 10000 ,  free: 4000,  reserved: 1000, activated: 4000, inactive: 1000)
+
+SELECT
+    d.status,COUNT(*),b.area_code,c.carrier_code
+FROM
+nm_number_inventory a,
+nm_area_code_master b,
+nm_carrier_code_master c,
+nm_status_master d
+WHERE 
+a.area_id= b.area_id (+)
+AND a.carrier_name_id=c.carrier_id (+)
+and a.status_id=d.status_id
+GROUP BY a.status_id,d.status,b.area_code,c.carrier_code
+ORDER BY d.status asc;
+
+________________________________________________________________________________________________________________________________________________
+A list of all DID Numbers ( Product Type, Status, Customer Name, circuit ID)
+SELECT
+    a.did_number,
+    b.sub_product_type,
+    c.status,
+    d.group_name
+FROM
+    nm_number_inventory     a,
+    nm_sub_product_master   b,
+    nm_status_master c,
+    nm_group_circuit d
+WHERE
+    a.sub_product_id = b.sub_product_id (+) AND 
+    a.status_id=c.status_id (+) AND 
+    a.nm_group_circuit_id=d.nm_group_circuit_id 
+________________________________________________________________________________________________________________________________________________
+
+
+A list of Group ID and Circuit ID
+
+select  g.Group_name ,n.circuit_id
+from nm_circuit n,
+nm_group_circuit g
+where n.nm_group_circuit_id = g.nm_group_circuit_id
+
+
+
+________________________________________________________________________________________________________________________________________________
+
+ A list of Call Forward Numbers
+
+select did_number,termination_number,Customer , ocn  from call_forward_did;
+________________________________________________________________________________________________________________________________________________
+
+
+④	A list of number usage status by Area code and carrier code  (quantity of Free, reserved, activated, inactive)
+
+SELECT
+    d.status,COUNT(*)
+FROM
+nm_number_inventory a,
+nm_area_code_master b,
+nm_carrier_code_master c,
+nm_status_master d
+WHERE 
+a.area_id= b.area_id (+)
+AND a.carrier_name_id=c.carrier_id (+)
+and a.status_id=d.status_id
+GROUP BY a.status_id,d.status
+
+(ex  ,  area and carrier code: 034510: 10000 ,  free: 4000,  reserved: 1000, activated: 4000, inactive: 1000)
+
+

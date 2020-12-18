@@ -1,0 +1,55 @@
+
+1 2 3 4 5 6 7 8
+
+delete 5
+
+1 2 3 4 8 6 7 5
+
+
+1 2 3  4 5 5 5  5
+
+
+                      
+
+
+
+SELECT
+    "A8"."DID_NUMBER"          "DID Number",
+    "A6"."COUNTRY_CODE_ISO"    "Country CODE",
+    "A6"."COUNTRY_NAME"        "Country Name",
+    "A5"."AREA_CODE"           "Area Code",
+    "A5"."AREA_NAME"           "Area Name",
+    "A4"."CARRIER_CODE"        "Carrier Code",
+    "A7"."STATUS"              "Status",
+    "A8"."CUSTOMER_OCN"        "Customer Number",
+    "A8"."CUSTOMER_ORG_NAME"   "Customer Name",
+    "A8"."ACTIVATED_DATE"      "Activated Date",
+    "A8"."CEASE_DATE"          "Cease Date",
+    "A8"."CREATED_BY"          "Created By",
+    "A8"."CREATED_DATE"        "Created Date",
+    "A8"."MODIFIED_BY"         "Modified BY",
+    "A8"."MODIFIED_DATE"       "MOdifed Date",
+    "A3"."SUB_CATEGORY_NAME"   "Category Name",
+    "A2"."SUB_PRODUCT_TYPE"    "Sub Product",
+    "A1"."CARRIER_NAME"        "Carrier Name",
+    Source_name       as         "Source Name"
+    
+FROM
+    NM_NUMBER_INVENTORY      "A8",
+    NM_STATUS_MASTER        "A7",
+    NM_COUNTRY_MASTER        "A6",
+    NM_AREA_CODE_MASTER      "A5",
+    NM_CARRIER_CODE_MASTER   "A4",
+    NM_SUB_CATEGORY_MASTER   "A3",
+    NM_SUB_PRODUCT_MASTER    "A2",
+    NM_CARRIER_NAME_MASTER   "A1",
+    nm_Source_Master  "nssm"
+WHERE
+    "A8"."STATUS_ID" = "A7"."STATUS_ID" (+)
+    AND "A8"."COUNTRY_ID" = "A6"."COUNTRY_ID" (+)
+    AND "A8"."CARRIER_ID" = "A4"."CARRIER_ID" (+)
+    AND "A8"."AREA_ID" = "A5"."AREA_ID" (+)
+    AND "A8"."SUB_CATEGORY_ID" = "A3"."SUB_CATEGORY_ID" (+)
+    AND "A8"."SUB_PRODUCT_ID" = "A2"."SUB_PRODUCT_ID" (+)
+   AND "A8"."CARRIER_NAME_ID" =   "A1"."CARRIER_NAME_ID"(+)
+   And "A8"."SOURCE_ID" = "nssm".SOURCE_ID

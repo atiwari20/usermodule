@@ -1,0 +1,22 @@
+1) A list of orders submitted by Sales/CRS (Daily/Weekly/Monthly)
+select ni.did_number as didNumber, 
+        ni.reservation_id as reservationId,
+        nmr.reserved_date
+         from nm_number_inventory ni,
+        nm_reservation_details nmr,nm_user nmu
+        where 
+        nmu.group_id in(4,5)
+        AND lower(nmr.reserved_by) = lower(nmu.user_id)
+        AND ni.reservation_id =nmr.reservation_id (+)
+        AND ni.status_id=60;
+
+2)
+A list of completed orders with order processor’s name
+
+select DISTINCT(nmu.first_name ||' ' || nmu.last_name) as userName,
+        ni.did_number as didNumber,nmr.reservation_id as reservationId from nm_number_inventory ni,
+        nm_reservation_details nmr,nm_user nmu
+        where 
+        lower(nmr.activated_by) = lower(nmu.user_id)
+        AND ni.reservation_id =nmr.reservation_id (+)
+        AND ni.status_id=50;
